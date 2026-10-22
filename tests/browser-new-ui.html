@@ -1,0 +1,40 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>ChatGPT DOM adapter regression</title>
+<style>[contenteditable]{min-height:50px;border:1px solid #aaa}button{padding:10px}</style>
+<div id="turns"></div>
+<form><div contenteditable="true" role="textbox" data-composer-markdown class="ProseMirror" aria-label="询问 ChatGPT"></div><button type="button" aria-label="发送">发送</button></form>
+<button hidden data-testid="stop-button">hidden stop</button><pre id="result">RUNNING</pre>
+<script src="../browser-extension/bridge-core.js?v=0.3.7"></script>
+<script>
+(async()=>{
+  const assert=(test,message)=>{if(!test)throw Error(message);};
+  const editor=document.querySelector('[contenteditable]'),send=document.querySelector('form button'),turns=document.querySelector('#turns');
+  let clicks=0,completed=0;const acknowledgements=[],lost=new Set();
+  send.addEventListener('click',()=>{
+    ++clicks;const prompt=editor.innerText;editor.replaceChildren();
+    turns.replaceChildren(); // Virtualized chat keeps the mounted answer count constant.
+    const user=document.createElement('div');user.setAttribute('data-user-message-bubble','true');user.textContent=prompt+' 附加标签';
+    const turn=document.createElement('div');turn.setAttribute('data-talvt-turn-state','streaming');
+    const role=document.createElement('h4');role.setAttribute('data-conversation-role','assistant');role.textContent='ChatGPT 说';
+    const answer=document.createElement('div');
+    if(clicks%2===0)answer.setAttribute('data-message-author-role','assistant');
+    const markdown=document.createElement('div');markdown.className='MarkdownRoot-fixture';markdown.textContent='生成中';answer.append(role,markdown);turn.append(user,answer);turns.append(turn);
+    setTimeout(()=>{markdown.textContent='相同的译文';turn.setAttribute('data-talvt-turn-state','complete');},12);
+  });
+  const api=async(route,body)=>{
+    if(route==='/health')return {enabled:true,epoch:1};
+    if(route==='/sent')acknowledgements.push(body.id);
+    if(route==='/complete'){
+      assert(body.reply==='相同的译文','wrong response');
+      if(body.id%7===0 && !lost.has(body.id)){lost.add(body.id);throw Object.assign(Error('lost response'),{retryable:true});}
+      ++completed;
+    }
+    return {accepted:true};
+  };
+  try{
+    const dom=CaptionChatBridge.driver(document);assert(dom.canSend(),'modern send button not found');assert(!dom.busy(),'hidden stop blocks sending');
+    for(let id=1;id<=100;++id){assert(completed===id-1,'overlapping task');await CaptionChatBridge.runTask({id,epoch:1,prompt:'Translate\n\nSentence '+id},api,dom,{pollMs:5,settleMs:10,maxWaitMs:2000});}
+    assert(clicks===100 && completed===100 && acknowledgements.length===100 && lost.size===14,'serial flow failed');
+    document.querySelector('#result').textContent='PASS: 100 sequential messages, 100 clicks, 100 completed replies, 14 recovered transport failures; constant reply count, repeated answer text, mixed DOM roles.';
+  }catch(error){document.querySelector('#result').textContent='FAIL: '+error.message;}
+})();
+</script></html>

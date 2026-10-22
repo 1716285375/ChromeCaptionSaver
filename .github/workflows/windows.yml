@@ -1,0 +1,60 @@
+name: Windows build and release
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Configure
+        run: >-
+          cmake --preset debug
+          -DVCPKG_TARGET_TRIPLET=x64-windows-static
+          -DCCS_STATIC_RUNTIME=ON
+          -DCCS_USE_LOCAL_APP_DATA=ON
+      - name: Build
+        run: cmake --build build/debug --config Release --parallel 4
+      - name: Test
+        run: ctest --test-dir build/debug -C Release --output-on-failure
+      - name: Package
+        run: ./scripts/package.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ChromeCaptionSaver-windows-x64
+          path: build/package/*.zip
+          if-no-files-found: error
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: windows-2022
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: ChromeCaptionSaver-windows-x64
+          path: package
+      - name: Publish release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          gh release create $env:RELEASE_TAG package/*.zip --verify-tag --title $env:RELEASE_TAG --generate-notes
+          if ($LASTEXITCODE -ne 0) { throw 'Release publication failed' }

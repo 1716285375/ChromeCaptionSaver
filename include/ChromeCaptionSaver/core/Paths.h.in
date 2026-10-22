@@ -1,0 +1,18 @@
+#pragma once
+#include <filesystem>
+#include <cstdlib>
+#include <stdexcept>
+#cmakedefine01 CCS_USE_LOCAL_APP_DATA
+
+namespace ccs::core {
+// Fixed at configure time so launching from another directory cannot redirect recordings.
+inline std::filesystem::path DefaultSessionsDirectory() {
+#if CCS_USE_LOCAL_APP_DATA
+    const auto* root = _wgetenv(L"LOCALAPPDATA");
+    if (!root || !*root) throw std::runtime_error("LOCALAPPDATA is unavailable");
+    return std::filesystem::path(root) / "ChromeCaptionSaver" / "data" / "sessions";
+#else
+    return std::filesystem::path(u8"@CMAKE_CURRENT_SOURCE_DIR@/data/sessions");
+#endif
+}
+}

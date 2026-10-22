@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "ChromeCaptionSaver · ChatGPT 网页联动",
+  "version": "0.3.7",
+  "description": "将桌面应用中排队的字幕逐条交给指定 ChatGPT 标签页，等待回答完成后继续。",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1/*",
+    "https://chatgpt.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "js": [
+        "bridge-core.js",
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

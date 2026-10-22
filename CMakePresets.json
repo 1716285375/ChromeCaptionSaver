@@ -1,0 +1,58 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "base",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      }
+    },
+    {
+      "name": "debug",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build/debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CCS_BUILD_GUI": "ON"
+      }
+    },
+    {
+      "name": "release",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CCS_BUILD_GUI": "ON"
+      }
+    },
+    {
+      "name": "debug-gui",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build/debug-gui",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CCS_BUILD_GUI": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release",
+      "configuration": "Release"
+    },
+    {
+      "name": "debug-gui",
+      "configurePreset": "debug-gui",
+      "configuration": "Debug"
+    }
+  ]
+}

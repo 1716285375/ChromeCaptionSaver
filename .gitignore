@@ -1,0 +1,43 @@
+# Local recordings, exports, settings and diagnostic captures
+/data/
+/work/
+/logs/
+/outputs/
+*.log
+*.dmp
+imgui.ini
+
+# Build products and downloaded dependencies
+/build/
+/out/
+/vcpkg_installed/
+/.cache/
+/CMakeUserPresets.json
+CMakeCache.txt
+CMakeFiles/
+*.exe
+*.dll
+*.lib
+*.pdb
+*.ilk
+*.obj
+*.pch
+*.zip
+*.7z
+
+# Editor and machine-specific settings
+.vs/
+.vscode/
+.idea/
+CMakeSettings.json
+*.user
+*.suo
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+
+# Local design briefs and development notes
+/ChromeCaptionSaver_AEE6B4BCE59196E688_DearImGui.md
+/docs/

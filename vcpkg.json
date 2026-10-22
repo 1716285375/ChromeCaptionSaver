@@ -1,0 +1,11 @@
+{
+  "name": "chromecaptionsaver",
+  "version-semver": "0.1.0",
+  "description": "Capture Chrome Live Caption text via UIA (no OCR, no injection, offline).",
+  "dependencies": [
+    "spdlog",
+    "nlohmann-json",
+    "gtest"
+  ],
+  "builtin-baseline": "365f6444ab40ee87c73c947b475b3a267b3cb77c"
+}
