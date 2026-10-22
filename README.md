@@ -48,13 +48,19 @@ Windows 11 x64 · C++20 · Dear ImGui · Win32 / DirectX 11
 ```powershell
 git submodule update --init --recursive
 $env:VCPKG_ROOT = 'C:\src\vcpkg' # 改为实际 vcpkg 安装路径
+
+# 调试构建
 cmake --preset debug
-cmake --build build/debug --config Release
-ctest --test-dir build/debug -C Release --output-on-failure
-.\build\Release\ChromeCaptionSaver.exe
+cmake --build --preset debug
+ctest --test-dir build/debug -C Debug --output-on-failure
+
+# 发布构建（Release）
+cmake --preset release
+cmake --build --preset release
+ctest --test-dir build/release -C Release --output-on-failure
 ```
 
-Debug 构建可使用 `cmake --build --preset debug`，程序位于 `build/Debug`。仅需命令行工具时设置 `-DCCS_BUILD_GUI=OFF`。浏览器协议测试需要 Node.js。
+仅需命令行工具时设置 `-DCCS_BUILD_GUI=OFF`。浏览器协议测试需要 Node.js。
 
 ## 命令行
 

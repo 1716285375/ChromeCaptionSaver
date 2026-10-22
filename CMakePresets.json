@@ -27,15 +27,6 @@
         "CMAKE_BUILD_TYPE": "Release",
         "CCS_BUILD_GUI": "ON"
       }
-    },
-    {
-      "name": "debug-gui",
-      "inherits": "base",
-      "binaryDir": "${sourceDir}/build/debug-gui",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "CCS_BUILD_GUI": "ON"
-      }
     }
   ],
   "buildPresets": [
@@ -48,11 +39,6 @@
       "name": "release",
       "configurePreset": "release",
       "configuration": "Release"
-    },
-    {
-      "name": "debug-gui",
-      "configurePreset": "debug-gui",
-      "configuration": "Debug"
     }
   ]
 }
