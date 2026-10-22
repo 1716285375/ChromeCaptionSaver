@@ -55,7 +55,8 @@ function fixture(){
   return {dom,api,calls,get clicks(){return clicks;},stop:()=>enabled=false,draft:()=>draft='mine',move:()=>path='/c/other',busy:()=>busy=true};
 }
 const task={id:1,epoch:1,prompt:'Translate\n\nHello.'};
-const options={pollMs:1,settleMs:2,maxWaitMs:40};
+// Windows CI timer scheduling can exceed 40 ms across two polling ticks.
+const options={pollMs:1,settleMs:2,maxWaitMs:1000};
 
 test('a shared turn containing the user and answer does not discard the answer',()=>{
   const markdown={innerText:'Answer body'};
